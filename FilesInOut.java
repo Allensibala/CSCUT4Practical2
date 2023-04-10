@@ -5,30 +5,48 @@ import java.util.*;
 import javax.swing.*;
 import java.lang.Number;
 
-/**
- * 
- * CSCU9T4 Java strings and files exercise.
- *
- */
 public class FilesInOut {
 
     public static void main(String[] args) {
-        // Replace this with statements to set the file name (input) and file name (output).
-        // Initially it will be easier to hardcode suitable file names.
+        Scanner scanner = new Scanner(System.in);
 
-        // Set up a new Scanner to read the input file.
-        // Processing line by line would be sensible here.
-        // Initially, echo the text to System.out to check you are reading correctly.
-        // Then add code to modify the text to the output format.
+        System.out.print("Enter input filepath: ");
+        String inputPath = scanner.nextLine().trim();
+        if (inputPath.isEmpty()) {
+            inputPath = "../Checkpoint4/input.txt";
+        }
 
-        // Set up a new PrintWriter to write the output file.
-        // Add suitable code into the above processing (because you need to do this line by line also.
-        // That is, read a line, write a line, loop.
+        System.out.print("Enter output filepath: ");
+        String outputPath = scanner.nextLine().trim();
+        if (outputPath.isEmpty()) {
+            outputPath = inputPath.replaceAll("\\.\\w+$", "") + "output.txt";
+        }
 
-        // Finally, add code to read the filenames as arguments from the command line.
+        try (Scanner inputScanner = new Scanner(new File(inputPath));
+             PrintWriter outputWriter = new PrintWriter(new FileWriter(outputPath))) {
 
-        System.out.println("You need to add your own code to do anything");
+            while (inputScanner.hasNextLine()) {
+                String line = inputScanner.nextLine();
+                String[] words = line.split(" ");
 
-    } // main
+                StringBuilder formattedName = new StringBuilder();
+                for (int i = 0; i < words.length; i++) {
+                    String word = words[i];
+                    String formattedWord = Character.toUpperCase(word.charAt(0)) + word.substring(1).toLowerCase().replaceAll("\\d", "");
+                    formattedName.append(i == 0 ? formattedWord : " " + formattedWord);
+                }
 
-} // FilesInOut
+                String dateString = line.substring(line.lastIndexOf(" ") + 1);
+                String formattedDate = String.format("%s/%s/%s", dateString.substring(0, 2), dateString.substring(2, 4), dateString.substring(4));
+
+                outputWriter.println(formattedName + " " + formattedDate);
+            }
+
+            System.out.println("Output file created: " + outputPath);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        }
+    }
+}
